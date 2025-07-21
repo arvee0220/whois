@@ -93,9 +93,13 @@ cd frontend
 
 # Install dependencies
 npm install
+  or
+pnpm install
 
 # Start development server
 npm run dev
+  or
+pnpm dev
 ```
 
 The frontend will be available at: **http://localhost:3000**
