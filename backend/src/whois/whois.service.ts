@@ -1,5 +1,9 @@
 import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
-import { WhoisResponse } from "src/description/whois.interface";
+import {
+    ContactInfo,
+    DomainInfo,
+    WhoisResponse,
+} from "src/description/whois.interface";
 
 @Injectable()
 export class WhoisService {
@@ -7,6 +11,38 @@ export class WhoisService {
     private readonly apiUrl =
         process.env.WHOIS_API_URL ||
         "https://www.whoisxmlapi.com/whoisserver/WhoisService";
+
+    private formatDate(dateString: string): string {
+        if (!dateString) return "";
+
+        try {
+            const date = new Date(dateString);
+            return date.toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "2-digit",
+                day: "2-digit",
+            });
+        } catch {
+            return dateString; // Return original string if parsing fails
+        }
+    }
+
+    formatContactInfo(whoisData: WhoisResponse): ContactInfo {
+        const record = whoisData.WhoisRecord;
+
+        return {
+            registrantName: record.registrant?.name || "Not available",
+            technicalContactName:
+                record.technicalContact?.name || "Not available",
+            administrativeContactName:
+                record.administrativeContact?.name || "Not available",
+            contactEmail:
+                record.registrant?.email ||
+                record.technicalContact?.email ||
+                record.administrativeContact?.email ||
+                "Not available",
+        };
+    }
 
     async getWhoisInfo(domain: string): Promise<WhoisResponse> {
         if (!this.apiKey) {
@@ -25,7 +61,7 @@ export class WhoisService {
                 throw new Error(`HTTP error! status: ${res.status}`);
             }
 
-            const data = await res.json();
+            const data = (await res.json()) as WhoisResponse;
 
             if (!data.WhoisRecord) {
                 throw new HttpException(
@@ -44,11 +80,15 @@ export class WhoisService {
         }
     }
 
-    formatDomainInfo(whoisData: WhoisResponse): DomainInfo {
+    formatDomainInfo(
+        whoisData: WhoisResponse,
+        originalDomain?: string,
+    ): DomainInfo {
         const record = whoisData.WhoisRecord;
 
         // Domain age calculation
-        const createdDate = new DataTransfer(record.createdDate || "");
+        const createdDate = new Date(record.createdDate || "");
+        const now = new Date();
         const ageInYears = Math.floor(
             (now.getTime() - createdDate.getTime()) /
                 (1000 * 60 * 60 * 24 * 365),
@@ -67,7 +107,7 @@ export class WhoisService {
         }
 
         return {
-            domainName: record.domainName || domain,
+            domainName: record.domainName || originalDomain || "Not available",
             registrar: record.registrarName || "Not available",
             registrationDate:
                 this.formatDate(record.createdDate) || "Not available",
