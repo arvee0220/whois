@@ -42,9 +42,8 @@ Before running this application, make sure you have:
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/your-username/whois-fullstack-app.git
-cd whois-fullstack-app
-```
+git clone https://github.com/arvee0220/whois
+cd whois
 
 ### 2. Environment Configuration
 
