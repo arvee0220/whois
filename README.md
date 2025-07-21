@@ -34,7 +34,7 @@ A professional domain lookup service built with **Next.js** frontend and **NestJ
 Before running this application, make sure you have:
 
 - **Node.js** (v16 or higher) - [Download here](https://nodejs.org/)
-- **npm** or **yarn** package manager
+- **pnpm**, **npm** or **yarn** package manager
 - **Whois API Key** from [WhoisXML API](https://whois.whoisxmlapi.com/) (free tier available)
 
 ## 🛠️ Installation & Setup
